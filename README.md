@@ -1,4 +1,7 @@
 flask+pil+sql+套壳
+
+部分个人信息已隐蔽
+
 ![图像1](https://github.com/vsxq/qrcode-drive-away/blob/master/screen/Screenshot_20180623-214531.jpg)
 
 
