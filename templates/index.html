@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="static/weui.min.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="static/main.css?data=2018-5-11" />
+    <script src="{{ url_for('static', filename='axios.js') }}"></script>
+
+
+
+</head>
+
+<body>
+
+
+    <div class="weui-cells">
+
+        <div class="weui-cell weui-cell_select weui-cell_select-before">
+            <div class="weui-cell__hd">
+                <select class="weui-select" name="select2">
+                    <option value="1">+86</option>
+                    <option value="2">+80</option>
+                    <option value="3">+84</option>
+                    <option value="4">+87</option>
+                </select>
+            </div>
+
+            <input class="weui-cell__bd weui-input" type="tel" placeholder="请输入号码" id="telephone" />
+
+        </div>
+        <a href="#" onclick="refresh_img()" class="weui-btn weui-btn_primary">生成二维码</a>
+    </div>
+    <img class="code" id="img" src="static/img/background-image.jpg" />
+    <script src="static/util.js"></script>
+    <script>
+
+        var img = document.querySelector("#img")
+        function refresh_img() {
+            var tel = document.querySelector("#telephone")
+            var telephone = parseInt(tel.value)
+            if (telephone.toString().length != 11) {
+                show_info(tel, "请输入合法11位手机号")
+                return false
+            }
+            else {
+                axios.get('/address_img', {
+                    params: {
+                        tel: telephone
+                    }
+                })
+                    .then(function (response) {
+                        img.src = "static/img/" + response.data.img_name + ".jpg"
+
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        alert("服务器异常，请点击右上角，反馈给我们")
+                    });
+
+            }
+
+        }
+    </script>
+</body>
+
+</html>

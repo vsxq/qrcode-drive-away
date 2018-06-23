@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>扫描结果</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="static/weui.min.css" />
+    <script src="{{ url_for('static', filename='axios.js') }}"></script>
+    <style>
+       .code {
+
+position: absolute;
+z-index: -1;
+width: 100%;
+height: 100%;
+top: 0px;
+left: 0px;
+width: 100%;
+height: 100%;
+}
+    </style>
+</head>
+
+<body>
+    <div class="weui-toptips weui-toptips_warn js_tooltips">请输入正确验证码</div>
+    <div class="weui-cells">
+    <div class="weui-cell weui-cell_vcode" >
+        <div class="weui-cell__hd"><label class="weui-label">验证码</label></div>
+        <div class="weui-cell__bd">
+            <input class="weui-input" type="number" placeholder="请输入验证码" >
+        </div>
+        <div class="weui-cell__ft">
+            <img class="weui-vcode-img" src="" onclick="get_captcha()" id="img">
+        </div>
+    </div>
+    <a href="#" onclick="check_captcha()" class="weui-btn weui-btn_primary">提交</a>
+    </div>
+    <img class="code" id="img" src="static/img/background-image.jpg" />
+    <script>
+        i = document.getElementById("img")
+        function check_captcha() {
+            var v = document.querySelector("input")
+            axios.get("/check", {
+                params: {
+                    "captcha": v.value
+                }
+            })
+                .then(function (response) {
+                    console.log(response.data);
+                    switch (response.data.code) {
+                        case "success": location.href = "/success"; break;
+                        case "fail": alert("非法二维码"); break;
+                        case "error": show_info(v) ; break;
+                        default: alert("服务器发生错误，请点击右上角反馈给我们"); break
+
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+
+        function get_captcha() {
+            axios.get('/captcha', {
+                params: {
+
+                }
+            })
+                .then(function (response) {
+
+                    i.src = response.data
+                    window.onload = function () {
+                    };
+                    console.log(i)
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+        }
+        get_captcha()
+
+    </script>
+</body>
+
+</html>

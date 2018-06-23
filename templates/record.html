@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>查询记录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="static/weui.min.css" />
+
+
+</head>
+
+<body>
+    <div class="weui-cells">
+        <div class="weui-cell ">
+            <input class="weui-cell__bd weui-input" type="tel" placeholder="请输入手机号" style="text-align: center" id="telephone" value="{{telephone}}"
+            />
+
+        </div>
+        <div class="weui-cell">
+            <input class="weui-cell__bd weui-input" placeholder="请输入邀请码" style="text-align: center" id="Invitation_code" value="{{Invitation_code}}"
+            />
+        </div>
+
+
+        <a href="#" onclick="search_record()" class="weui-btn weui-btn_primary">查询</a>
+
+
+    </div>
+    <div class="table_show"  style="display: none">
+        <div class="weui-cells__title">查询结果</div>
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <p>时间</p>
+            </div>
+            <div class="weui-cell__ft">ip</div>
+        </div>
+        <div id="te"></div>
+    </div>
+
+
+    <script src="{{ url_for('static', filename='axios.js') }}"></script>
+    <script src="static/util.js?t-2018-5-11"></script>
+    <script>
+        function get_list(data) {
+            data = data.results
+            list = document.querySelector("#te")
+            //清除子节点
+            list.innerHTML = ""; 
+            for (var i = 0; i < data.length; i++) {
+                div = document.createElement("div")
+                div.className = "weui-cell"
+                div_ip = document.createElement("div")
+                div_ip.className = "weui-cell__ft"
+                div_ip.innerText = data[i].ip
+                div_date = document.createElement("div")
+                div_date.className = "weui-cell__bd"
+                p_date = document.createElement("p")
+                p_date.innerText = data[i].date
+                div_date.appendChild(p_date)
+                div.appendChild(div_date)
+                div.appendChild(div_ip)
+                list.appendChild(div)
+            }
+            document.querySelector(".table_show").style.display="block"
+        }
+        function search_record() {
+            var tel = document.querySelector("#telephone")
+            var telephone = parseInt(tel.value)
+            var Invitation_code = document.querySelector("#Invitation_code")
+            var data
+            if (telephone.toString().length != 11) {
+                show_info(tel, "请输入11位手机号")
+               
+            }
+            else {
+                if (Invitation_code.value == "" || Invitation_code.value == undefined) {
+                    show_info(Invitation_code, "请输入邀请码")
+                    
+                }
+                else {
+                    axios.get("/search_data", {
+                        params: {
+                            tel: telephone,
+                            Invitation_code: Invitation_code.value
+                        }
+                    }).then(function (response) {
+                        status = response.data.status
+                        console.log(status)
+                        switch (status) {
+                            case "success": console.log(response.data)
+                                if (response.data.results != null)
+
+                                    get_list(response.data)
+                                else show_info(tel, "该手机号查无结果")
+
+                                break;
+                            case "fatal": show_info(Invitation_code, "邀请码错误,请重新输入"); break;
+                            case "error": alert("请求错误,请刷新后重试"); break;
+                            default: alert("服务器异常,请点击右上角联系我们"); break;
+                        }
+                    })
+                        .catch(function (error) {
+                            console.log(error);
+                            alert("服务器异常，请点击右上角，反馈给我们")
+                        });
+                }
+
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>
